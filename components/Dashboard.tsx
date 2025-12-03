@@ -34,29 +34,50 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [portfolioRes, propertiesRes, metricsRes, trendsRes, performanceRes] = await Promise.all([
-          fetch('/api/portfolio'),
-          fetch('/api/properties'),
-          fetch('/api/metrics'),
-          fetch('/api/market-trends'),
-          fetch('/api/performance'),
-        ]);
+        // Try API routes first (for local dev)
+        const portfolioRes = await fetch('/api/portfolio').catch(() => null);
+        const propertiesRes = await fetch('/api/properties').catch(() => null);
+        const metricsRes = await fetch('/api/metrics').catch(() => null);
+        const trendsRes = await fetch('/api/market-trends').catch(() => null);
+        const performanceRes = await fetch('/api/performance').catch(() => null);
 
-        const [portfolio, props, metrics, trends, perf] = await Promise.all([
-          portfolioRes.json(),
-          propertiesRes.json(),
-          metricsRes.json(),
-          trendsRes.json(),
-          performanceRes.json(),
-        ]);
-
-        setPortfolioMetrics(portfolio);
-        setProperties(props);
-        setFinancialMetrics(metrics);
-        setMarketTrends(trends);
-        setPerformance(perf);
+        if (portfolioRes?.ok && propertiesRes?.ok && metricsRes?.ok && trendsRes?.ok && performanceRes?.ok) {
+          // Use API routes (local development)
+          const [portfolio, props, metrics, trends, perf] = await Promise.all([
+            portfolioRes.json(),
+            propertiesRes.json(),
+            metricsRes.json(),
+            trendsRes.json(),
+            performanceRes.json(),
+          ]);
+          
+          setPortfolioMetrics(portfolio);
+          setProperties(props);
+          setFinancialMetrics(metrics);
+          setMarketTrends(trends);
+          setPerformance(perf);
+        } else {
+          // Fallback to static data generation (for GitHub Pages)
+          const staticData = await import('@/lib/static-data');
+          setPortfolioMetrics(staticData.getPortfolioMetrics());
+          setProperties(staticData.getProperties());
+          setFinancialMetrics(staticData.getFinancialMetrics());
+          setMarketTrends(staticData.getMarketTrends());
+          setPerformance(staticData.getPropertyPerformance());
+        }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error loading data:', error);
+        // Last resort: generate data directly
+        try {
+          const staticData = await import('@/lib/static-data');
+          setPortfolioMetrics(staticData.getPortfolioMetrics());
+          setProperties(staticData.getProperties());
+          setFinancialMetrics(staticData.getFinancialMetrics());
+          setMarketTrends(staticData.getMarketTrends());
+          setPerformance(staticData.getPropertyPerformance());
+        } catch (fallbackError) {
+          console.error('Fallback data generation failed:', fallbackError);
+        }
       } finally {
         setLoading(false);
       }
