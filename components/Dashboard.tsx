@@ -69,12 +69,12 @@ export default function Dashboard() {
         console.error('Error loading data:', error);
         // Last resort: generate data directly
         try {
-          const staticData = await import('@/lib/static-data');
-          setPortfolioMetrics(staticData.getPortfolioMetrics());
-          setProperties(staticData.getProperties());
-          setFinancialMetrics(staticData.getFinancialMetrics());
-          setMarketTrends(staticData.getMarketTrends());
-          setPerformance(staticData.getPropertyPerformance());
+          const { getProperties, getFinancialMetrics, getMarketTrends, getPortfolioMetrics, getPropertyPerformance } = await import('@/lib/static-data');
+          setPortfolioMetrics(getPortfolioMetrics());
+          setProperties(getProperties());
+          setFinancialMetrics(getFinancialMetrics());
+          setMarketTrends(getMarketTrends());
+          setPerformance(getPropertyPerformance());
         } catch (fallbackError) {
           console.error('Fallback data generation failed:', fallbackError);
         }

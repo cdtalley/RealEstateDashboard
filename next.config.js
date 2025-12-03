@@ -5,9 +5,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // GitHub Pages base path (matches repository name)
+  // GitHub Pages base path - MUST match repository name exactly
+  // Repository name: RealEstateDashboard
+  // GitHub Pages URL: https://cdtalley.github.io/RealEstateDashboard/
   basePath: '/RealEstateDashboard',
   assetPrefix: '/RealEstateDashboard',
+  trailingSlash: true,
 }
 
 module.exports = nextConfig
