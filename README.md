@@ -113,23 +113,6 @@ The dashboard is highly customizable:
 - Optimized re-renders with React hooks
 - Efficient chart rendering with Recharts
 
-## Deployment
-
-### GitHub Pages
-
-This dashboard is configured for GitHub Pages deployment. See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
-
-**Quick Deploy:**
-
-1. Push your code to a GitHub repository
-2. Enable GitHub Pages in repository settings
-3. Select "GitHub Actions" as the source
-4. The workflow will automatically build and deploy on every push to `main`
-
-Your site will be available at: `https://YOUR_USERNAME.github.io/real-estate-dashboard/`
-
-**Note:** The dashboard uses client-side data generation for static hosting compatibility. All analytics and visualizations work without a backend.
-
 ## License
 
 MIT

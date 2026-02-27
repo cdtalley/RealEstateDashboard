@@ -10,60 +10,34 @@ interface PortfolioInsightsProps {
 }
 
 export default function PortfolioInsights({ metrics, properties }: PortfolioInsightsProps) {
-  // Advanced analytics calculations
-  const lowOccupancyCount = properties.filter(p => p.occupancyRate < 0.85).length;
-  const highROICount = properties.filter(p => p.roi > 8).length;
-  const maintenanceCount = properties.filter(p => p.occupancyStatus === 'Maintenance').length;
-  
-  // Calculate Sharpe-like ratio (risk-adjusted return)
-  const rois = properties.map(p => p.roi);
-  const meanROI = metrics.averageROI;
-  const stdDevROI = Math.sqrt(rois.reduce((sum, r) => sum + Math.pow(r - meanROI, 2), 0) / rois.length);
-  const sharpeRatio = meanROI / stdDevROI;
-  
-  // Calculate portfolio concentration (Herfindahl index)
-  const cityDistribution = properties.reduce((acc, p) => {
-    const key = `${p.city}, ${p.state}`;
-    acc[key] = (acc[key] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-  const herfindahlIndex = Object.values(cityDistribution).reduce((sum, count) => {
-    return sum + Math.pow(count / properties.length, 2);
-  }, 0);
-  const concentrationRisk = herfindahlIndex > 0.25 ? 'High' : herfindahlIndex > 0.15 ? 'Medium' : 'Low';
-
   const insights = [
     {
       type: 'opportunity',
       icon: <Lightbulb className="w-5 h-5" />,
       title: 'Optimization Opportunity',
-      message: `${lowOccupancyCount} properties (${((lowOccupancyCount / properties.length) * 100).toFixed(1)}%) below 85% occupancy threshold. Statistical analysis suggests ${lowOccupancyCount > 10 ? 'systemic' : 'targeted'} intervention needed.`,
+      message: `${properties.filter(p => p.occupancyRate < 0.85).length} properties below 85% occupancy. Consider rent adjustments or marketing.`,
       color: 'blue',
-      metric: `${((lowOccupancyCount / properties.length) * 100).toFixed(1)}%`,
     },
     {
       type: 'success',
       icon: <TrendingUp className="w-5 h-5" />,
-      title: 'Risk-Adjusted Performance',
-      message: `Sharpe ratio of ${sharpeRatio.toFixed(2)} indicates ${sharpeRatio > 1.5 ? 'excellent' : sharpeRatio > 1 ? 'strong' : 'moderate'} risk-adjusted returns. Portfolio ROI ${metrics.averageROI > 7 ? 'significantly' : 'marginally'} exceeds market benchmark (6.5%).`,
+      title: 'Strong Performance',
+      message: `Portfolio ROI of ${metrics.averageROI.toFixed(1)}% exceeds market average of 6.5%. Excellent positioning.`,
       color: 'green',
-      metric: `Sharpe: ${sharpeRatio.toFixed(2)}`,
     },
     {
       type: 'warning',
       icon: <AlertTriangle className="w-5 h-5" />,
-      title: 'Portfolio Concentration Risk',
-      message: `Herfindahl index of ${herfindahlIndex.toFixed(3)} indicates ${concentrationRisk.toLowerCase()} geographic concentration. ${maintenanceCount} properties require immediate attention.`,
+      title: 'Maintenance Alert',
+      message: `${properties.filter(p => p.occupancyStatus === 'Maintenance').length} properties require attention. Schedule inspections.`,
       color: 'yellow',
-      metric: `HHI: ${herfindahlIndex.toFixed(3)}`,
     },
     {
       type: 'recommendation',
       icon: <Target className="w-5 h-5" />,
-      title: 'ML-Driven Acquisition Strategy',
-      message: `Clustering analysis identifies ${highROICount} high-performing properties. Feature importance suggests targeting similar characteristics in ${properties.filter(p => p.roi > 8).length > 0 ? properties.find(p => p.roi > 8)?.city : 'emerging markets'} could yield ${(highROICount / properties.length * 100).toFixed(0)}% portfolio expansion opportunity.`,
+      title: 'Strategic Recommendation',
+      message: `Consider acquiring ${properties.filter(p => p.roi > 8).length} similar high-ROI properties in ${properties.filter(p => p.roi > 8).length > 0 ? properties.find(p => p.roi > 8)?.city : 'target markets'}.`,
       color: 'purple',
-      metric: `${highROICount} clusters`,
     },
   ];
 
@@ -83,8 +57,8 @@ export default function PortfolioInsights({ metrics, properties }: PortfolioInsi
           <Zap className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="text-white font-semibold text-lg">Advanced Portfolio Analytics</h3>
-          <p className="text-slate-400 text-sm">Statistical insights & ML-driven recommendations</p>
+          <h3 className="text-white font-semibold text-lg">AI Portfolio Insights</h3>
+          <p className="text-slate-400 text-sm">Actionable recommendations & alerts</p>
         </div>
       </div>
 
@@ -120,14 +94,7 @@ export default function PortfolioInsights({ metrics, properties }: PortfolioInsi
                 {insight.icon}
               </div>
               <div className="flex-1">
-                <div className="flex items-center justify-between mb-1">
-                  <h4 className="text-white font-medium">{insight.title}</h4>
-                  {insight.metric && (
-                    <span className="text-xs px-2 py-0.5 bg-slate-700/50 rounded text-slate-300 font-mono">
-                      {insight.metric}
-                    </span>
-                  )}
-                </div>
+                <h4 className="text-white font-medium mb-1">{insight.title}</h4>
                 <p className="text-slate-300 text-sm">{insight.message}</p>
               </div>
             </div>

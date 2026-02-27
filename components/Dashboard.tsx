@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { PortfolioMetrics, Property, FinancialMetric, MarketTrend, PropertyPerformance } from '@/lib/types';
 import MetricCard from './MetricCard';
@@ -17,9 +18,19 @@ import PropertyDetailModal from './PropertyDetailModal';
 import DateRangeSelector from './DateRangeSelector';
 import PriceSegmentAnalysis from './PriceSegmentAnalysis';
 import AccessRateHeatmap from './AccessRateHeatmap';
-import StatisticalAnalysis from './StatisticalAnalysis';
-import ModelPerformance from './ModelPerformance';
 import { TrendingUp, Home, DollarSign, Users, MapPin, BarChart3 } from 'lucide-react';
+
+// Dynamic import for map component to avoid SSR issues
+const GeoSpatialMap = dynamic(() => import('./GeoSpatialMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-6 border border-slate-700 shadow-lg">
+      <div className="h-[600px] flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    </div>
+  ),
+});
 
 export default function Dashboard() {
   const [portfolioMetrics, setPortfolioMetrics] = useState<PortfolioMetrics | null>(null);
@@ -34,50 +45,29 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Try API routes first (for local dev)
-        const portfolioRes = await fetch('/api/portfolio').catch(() => null);
-        const propertiesRes = await fetch('/api/properties').catch(() => null);
-        const metricsRes = await fetch('/api/metrics').catch(() => null);
-        const trendsRes = await fetch('/api/market-trends').catch(() => null);
-        const performanceRes = await fetch('/api/performance').catch(() => null);
+        const [portfolioRes, propertiesRes, metricsRes, trendsRes, performanceRes] = await Promise.all([
+          fetch('/api/portfolio'),
+          fetch('/api/properties'),
+          fetch('/api/metrics'),
+          fetch('/api/market-trends'),
+          fetch('/api/performance'),
+        ]);
 
-        if (portfolioRes?.ok && propertiesRes?.ok && metricsRes?.ok && trendsRes?.ok && performanceRes?.ok) {
-          // Use API routes (local development)
-          const [portfolio, props, metrics, trends, perf] = await Promise.all([
-            portfolioRes.json(),
-            propertiesRes.json(),
-            metricsRes.json(),
-            trendsRes.json(),
-            performanceRes.json(),
-          ]);
-          
-          setPortfolioMetrics(portfolio);
-          setProperties(props);
-          setFinancialMetrics(metrics);
-          setMarketTrends(trends);
-          setPerformance(perf);
-        } else {
-          // Fallback to static data generation (for GitHub Pages)
-          const staticData = await import('@/lib/static-data');
-          setPortfolioMetrics(staticData.getPortfolioMetrics());
-          setProperties(staticData.getProperties());
-          setFinancialMetrics(staticData.getFinancialMetrics());
-          setMarketTrends(staticData.getMarketTrends());
-          setPerformance(staticData.getPropertyPerformance());
-        }
+        const [portfolio, props, metrics, trends, perf] = await Promise.all([
+          portfolioRes.json(),
+          propertiesRes.json(),
+          metricsRes.json(),
+          trendsRes.json(),
+          performanceRes.json(),
+        ]);
+
+        setPortfolioMetrics(portfolio);
+        setProperties(props);
+        setFinancialMetrics(metrics);
+        setMarketTrends(trends);
+        setPerformance(perf);
       } catch (error) {
-        console.error('Error loading data:', error);
-        // Last resort: generate data directly
-        try {
-          const { getProperties, getFinancialMetrics, getMarketTrends, getPortfolioMetrics, getPropertyPerformance } = await import('@/lib/static-data');
-          setPortfolioMetrics(getPortfolioMetrics());
-          setProperties(getProperties());
-          setFinancialMetrics(getFinancialMetrics());
-          setMarketTrends(getMarketTrends());
-          setPerformance(getPropertyPerformance());
-        } catch (fallbackError) {
-          console.error('Fallback data generation failed:', fallbackError);
-        }
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
@@ -206,14 +196,9 @@ export default function Dashboard() {
           <AccessRateHeatmap properties={properties} />
         </div>
 
-        {/* Statistical Analysis & ML Insights */}
+        {/* Advanced Geospatial Map */}
         <div className="mb-8">
-          <StatisticalAnalysis properties={properties} financialMetrics={financialMetrics} />
-        </div>
-
-        {/* ML Model Performance */}
-        <div className="mb-8">
-          <ModelPerformance data={financialMetrics} />
+          <GeoSpatialMap properties={properties} />
         </div>
 
         {/* Geographic Distribution */}

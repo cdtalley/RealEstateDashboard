@@ -26,13 +26,9 @@ interface PriceSegment {
 
 export default function PriceSegmentAnalysis({ properties }: PriceSegmentAnalysisProps) {
   const segments = useMemo(() => {
-    if (!properties || properties.length === 0) {
-      return [];
-    }
-    
     const sorted = [...properties].sort((a, b) => a.currentValue - b.currentValue);
-    const minPrice = sorted[0]?.currentValue || 0;
-    const maxPrice = sorted[sorted.length - 1]?.currentValue || 0;
+    const minPrice = sorted[0].currentValue;
+    const maxPrice = sorted[sorted.length - 1].currentValue;
     
     // Define price segments
     const segmentRanges = [
@@ -45,12 +41,7 @@ export default function PriceSegmentAnalysis({ properties }: PriceSegmentAnalysi
 
     return segmentRanges.map(range => {
       const segmentProps = properties.filter(
-        p => {
-          if (range.max === Infinity) {
-            return p.currentValue >= range.min;
-          }
-          return p.currentValue >= range.min && p.currentValue < range.max;
-        }
+        p => p.currentValue >= range.min && p.currentValue < range.max
       );
 
       if (segmentProps.length === 0) return null;

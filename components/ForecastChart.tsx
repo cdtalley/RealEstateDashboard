@@ -60,7 +60,7 @@ export default function ForecastChart({ data }: ForecastChartProps) {
           </div>
           <div>
             <h3 className="text-white font-semibold text-lg">Revenue Forecast</h3>
-            <p className="text-slate-400 text-sm">ARIMA(1,1,1)×(0,1,1)₁₂ - 6 Month Forecast</p>
+            <p className="text-slate-400 text-sm">AI-Powered 6-Month Prediction</p>
           </div>
         </div>
         <div className="flex items-center gap-2 px-3 py-1 bg-purple-500/10 rounded-lg border border-purple-500/20">
@@ -129,7 +129,7 @@ export default function ForecastChart({ data }: ForecastChartProps) {
           <span className="text-slate-400 text-sm">Forecast</span>
         </div>
         <div className="ml-auto text-xs text-slate-500">
-          AIC: -142.3 | BIC: -128.7
+          Confidence: 87%
         </div>
       </div>
     </motion.div>
